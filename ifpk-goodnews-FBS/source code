@@ -1,0 +1,220 @@
+import { useState, useEffect, useRef, useCallback } from “react”;
+
+const goodNews = [
+{ emoji: “🌍”, cat: “Umwelt”, title: “Großstädte senken Luftverschmutzung drastisch”, text: “19 Metropolen weltweit, darunter Peking, London und Paris, haben ihre Luftverschmutzung in nur 15 Jahren um 20-40% reduziert. Radfahren, Umweltzonen und E-Autos treiben den Wandel voran.” },
+{ emoji: “🐢”, cat: “Natur”, title: “Riesenschildkröten kehren nach Galapagos zurück”, text: “Zum ersten Mal seit fast 200 Jahren streifen Riesenschildkröten wieder über die Galapagos-Insel Floreana – dank eines der ehrgeizigsten Ökosystem-Projekte des Archipels.” },
+{ emoji: “💊”, cat: “Gesundheit”, title: “Neue Behandlung für Spina bifida zeigt Erfolge”, text: “Eine bahnbrechende Stammzellbehandlung verbessert die Mobilität und Lebensqualität von Kindern mit Spina bifida bereits im Mutterleib erheblich.” },
+{ emoji: “🏥”, cat: “Medizin”, title: “Unheilbare Augenkrankheit erstmals behandelt”, text: “Das Moorfields Eye Hospital in London hat erstmals erfolgreich Hypotonie behandelt – eine Augenerkrankung, die zur Erblindung führen kann. Bei 7 von 8 Patienten verbesserte sich der Zustand.” },
+{ emoji: “🌊”, cat: “Ozean”, title: “Globaler Ozeanvertrag tritt in Kraft”, text: “Der Global Ocean Treaty ist offiziell in Kraft getreten und schützt nun die Hochsee – ein historischer Meilenstein für den Meeresschutz weltweit.” },
+{ emoji: “📉”, cat: “Sicherheit”, title: “US-Mordrate sinkt auf historisches Tief”, text: “Die Mordrate in den USA fällt seit 2023 kontinuierlich und erreichte 2025 einen historischen Rückgang. Experten sprechen von enormem Fortschritt.” },
+{ emoji: “🦋”, cat: “Natur”, title: “Rewilding: 900% mehr Brutvögel in 20 Jahren”, text: “Das Knepp Rewilding Estate in Sussex verzeichnet eine dramatische Erholung der Tierwelt: Schmetterlinge verdoppelten sich, Libellen nahmen um 900% zu.” },
+{ emoji: “🌿”, cat: “Umwelt”, title: “Chile plant riesigen Nationalpark am Ende der Welt”, text: “Der geplante Cape Froward Nationalpark wird 150.000 Hektar subantarktische Wälder, Moorlandschaften und Küste an der Südspitze Amerikas schützen.” },
+{ emoji: “🔬”, cat: “Medizin”, title: “Neues Medikament hilft Kindern mit seltener Epilepsie”, text: “Das Medikament Zorevunersen reduziert Anfälle bei Kindern mit Dravet-Syndrom um bis zu 91% und verbessert ihre Lebensqualität über drei Jahre hinweg.” },
+{ emoji: “💨”, cat: “Energie”, title: “Erster Geothermie-Kraftwerk in UK nimmt Betrieb auf”, text: “Das United Downs Kraftwerk in Cornwall liefert sauberen Strom für 10.000 Haushalte und produziert gleichzeitig Lithium für die Elektromobilität.” },
+{ emoji: “🌞”, cat: “Energie”, title: “Afrikas Solarenergie boomt”, text: “Afrika macht große Fortschritte bei Solarenergie und überspringt fossile Brennstoffe auf dem Weg zu einer saubereren Energiezukunft.” },
+{ emoji: “🇺🇦”, cat: “Natur”, title: “Ukraine: Feuchtgebiet erholt sich trotz Krieg”, text: “Am Kartal-See im Donaudelta zeigt ein Renaturierungsprojekt erstaunliche Ergebnisse – die Natur erholt sich fast sofort nach der Wiederanbindung an die Donau.” },
+{ emoji: “📖”, cat: “Kultur”, title: “20 Jahre Quick Reads: Lesen für alle”, text: “Die UK-Initiative Quick Reads feiert 20 Jahre und bringt kurze, günstige Bücher von Bestsellerautoren heraus – erstmals auch als Hörbücher. 500.000 Exemplare gehen an Gefängnisse.” },
+{ emoji: “🏭”, cat: “Klima”, title: “Net Zero günstiger als Öl-Preisschock”, text: “Eine britische Analyse zeigt: Der Weg zu Klimaneutralität bis 2050 kostet weniger als die Folgen der Abhängigkeit von fossilen Brennstoffen bei Ölkrisen.” },
+{ emoji: “⚡”, cat: “Energie”, title: “Offshore-Windpark trotzt politischem Widerstand”, text: “Vineyard Wind vor Massachusetts liefert saubere Energie – der erste fertiggestellte Offshore-Windpark trotz Versuchen, den Bau zu stoppen.” },
+{ emoji: “🇭🇷”, cat: “Frieden”, title: “Kroatien ist landminenfrei”, text: “Kroatien hat offiziell alle Landminen aus seinem Territorium entfernt – ein historischer Erfolg für die Sicherheit der Bevölkerung.” },
+{ emoji: “🦎”, cat: “Natur”, title: “Ausgestorbene Spezies kehrt nach England zurück”, text: “Eine als ausgestorben geltende Tierart ist nach England zurückgekehrt – ein Beweis dafür, dass Naturschutzmaßnahmen wirken.” },
+{ emoji: “🚗”, cat: “Umwelt”, title: “Diesel verschwindet aus Großbritannien”, text: “Peak Diesel wurde 2017 erreicht. Bis 2035 werden weniger als 250.000 Diesel-PKW auf britischen Straßen unterwegs sein – ein Gewinn für die Gesundheit.” },
+{ emoji: “🇨🇳”, cat: “Wirtschaft”, title: “Grüne Technologie treibt Chinas Wachstum”, text: “E-Autos, Solarenergie und grüne Technologie waren für über ein Drittel des chinesischen Wirtschaftswachstums 2025 verantwortlich.” },
+{ emoji: “🏞️”, cat: “Natur”, title: “Chinesischer Fluss erholt sich”, text: “Ein chinesischer Fluss, der am Rande des ökologischen Zusammenbruchs stand, zeigt bemerkenswerte Erholungszeichen dank konsequenter Schutzmaßnahmen.” },
+];
+
+const upgrades = [
+{ name: “Besserer Cursor”, cost: 15, cps: 0.1, icon: “👆” },
+{ name: “Oma-Bäckerin”, cost: 100, cps: 1, icon: “👵” },
+{ name: “Cookie-Farm”, cost: 500, cps: 5, icon: “🌾” },
+{ name: “Cookie-Fabrik”, cost: 2000, cps: 20, icon: “🏭” },
+{ name: “Cookie-Mine”, cost: 7000, cps: 75, icon: “⛏️” },
+{ name: “Cookie-Bank”, cost: 25000, cps: 250, icon: “🏦” },
+{ name: “Cookie-Tempel”, cost: 100000, cps: 1000, icon: “🏛️” },
+];
+
+function formatNum(n) {
+if (n >= 1e12) return (n/1e12).toFixed(1) + “T”;
+if (n >= 1e9) return (n/1e9).toFixed(1) + “B”;
+if (n >= 1e6) return (n/1e6).toFixed(1) + “M”;
+if (n >= 1e3) return (n/1e3).toFixed(1) + “K”;
+return Math.floor(n).toString();
+}
+
+function CookieClicker() {
+const [cookies, setCookies] = useState(0);
+const [cps, setCps] = useState(0);
+const [owned, setOwned] = useState(upgrades.map(() => 0));
+const [clickAnim, setClickAnim] = useState(false);
+const [floats, setFloats] = useState([]);
+
+useEffect(() => {
+const iv = setInterval(() => {
+setCookies(c => c + cps / 10);
+}, 100);
+return () => clearInterval(iv);
+}, [cps]);
+
+const click = () => {
+setCookies(c => c + 1);
+setClickAnim(true);
+setTimeout(() => setClickAnim(false), 100);
+const id = Date.now();
+setFloats(f => […f, id]);
+setTimeout(() => setFloats(f => f.filter(x => x !== id)), 800);
+};
+
+const buy = (i) => {
+const cost = Math.floor(upgrades[i].cost * Math.pow(1.15, owned[i]));
+if (cookies >= cost) {
+setCookies(c => c - cost);
+setCps(c => c + upgrades[i].cps);
+setOwned(o => { const n = […o]; n[i]++; return n; });
+}
+};
+
+return (
+<div style={{ display:“flex”, flexDirection:“column”, height:“100%”, background:“linear-gradient(180deg,#1a0a2e,#16213e)”, color:”#fff”, padding:“12px”, overflowY:“auto” }}>
+<div style={{ textAlign:“center”, marginBottom:8 }}>
+<div style={{ fontSize:12, color:”#8be9fd”, letterSpacing:1, textTransform:“uppercase” }}>Cookie Clicker</div>
+<div style={{ fontSize:28, fontWeight:800, color:”#f1fa8c” }}>{formatNum(cookies)}</div>
+<div style={{ fontSize:11, color:”#bd93f9” }}>{formatNum(cps)} pro Sekunde</div>
+</div>
+<div style={{ textAlign:“center”, margin:“8px 0”, position:“relative” }}>
+<button onClick={click} style={{
+fontSize:56, background:“none”, border:“none”, cursor:“pointer”,
+transform: clickAnim ? “scale(0.9)” : “scale(1)”,
+transition:“transform 0.1s”, filter:“drop-shadow(0 0 12px rgba(241,250,140,0.5))”,
+position:“relative”
+}}>🍪</button>
+{floats.map(id => (
+<span key={id} style={{
+position:“absolute”, left:“50%”, top:“30%”, pointerEvents:“none”,
+animation:“floatUp 0.8s ease-out forwards”, fontSize:14, fontWeight:700, color:”#f1fa8c”
+}}>+1</span>
+))}
+</div>
+<div style={{ flex:1, overflowY:“auto” }}>
+{upgrades.map((u, i) => {
+const cost = Math.floor(u.cost * Math.pow(1.15, owned[i]));
+const canBuy = cookies >= cost;
+return (
+<button key={i} onClick={() => buy(i)} style={{
+display:“flex”, alignItems:“center”, gap:8, width:“100%”,
+padding:“6px 8px”, marginBottom:4, borderRadius:8,
+background: canBuy ? “rgba(139,233,253,0.15)” : “rgba(255,255,255,0.05)”,
+border: canBuy ? “1px solid rgba(139,233,253,0.3)” : “1px solid rgba(255,255,255,0.1)”,
+color: canBuy ? “#fff” : “#666”, cursor: canBuy ? “pointer” : “not-allowed”,
+textAlign:“left”, transition:“all 0.2s”
+}}>
+<span style={{ fontSize:20 }}>{u.icon}</span>
+<div style={{ flex:1 }}>
+<div style={{ fontSize:12, fontWeight:600 }}>{u.name} <span style={{color:”#bd93f9”}}>x{owned[i]}</span></div>
+<div style={{ fontSize:10, color:”#8be9fd” }}>{formatNum(cost)} 🍪 | +{u.cps}/s</div>
+</div>
+</button>
+);
+})}
+</div>
+<style>{`@keyframes floatUp { 0% { opacity:1; transform:translateX(-50%) translateY(0); } 100% { opacity:0; transform:translateX(-50%) translateY(-40px); } }`}</style>
+</div>
+);
+}
+
+function NewsFeed() {
+const scrollRef = useRef(null);
+const [paused, setPaused] = useState(false);
+const [currentIdx, setCurrentIdx] = useState(0);
+const [progress, setProgress] = useState(0);
+
+useEffect(() => {
+if (paused) return;
+const iv = setInterval(() => {
+setProgress(p => {
+if (p >= 100) {
+setCurrentIdx(i => (i + 1) % goodNews.length);
+return 0;
+}
+return p + 0.5;
+});
+}, 30);
+return () => clearInterval(iv);
+}, [paused]);
+
+const visible = [];
+for (let i = 0; i < 4; i++) {
+visible.push(goodNews[(currentIdx + i) % goodNews.length]);
+}
+
+const catColors = {
+“Umwelt”: “#50fa7b”, “Natur”: “#8be9fd”, “Gesundheit”: “#ff79c6”,
+“Medizin”: “#ff79c6”, “Ozean”: “#8be9fd”, “Sicherheit”: “#ffb86c”,
+“Energie”: “#f1fa8c”, “Kultur”: “#bd93f9”, “Klima”: “#50fa7b”,
+“Frieden”: “#ffb86c”, “Wirtschaft”: “#f1fa8c”
+};
+
+return (
+<div style={{ display:“flex”, flexDirection:“column”, height:“100%”, background:“linear-gradient(180deg,#0d1117,#161b22)”, padding:“12px 16px”, overflowHidden:true }}
+onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
+onTouchStart={() => setPaused(true)} onTouchEnd={() => setPaused(false)}>
+<div style={{ display:“flex”, alignItems:“center”, justifyContent:“space-between”, marginBottom:12 }}>
+<div>
+<span style={{ fontSize:16, fontWeight:800, color:”#fff” }}>✨ Good News</span>
+<span style={{ fontSize:10, color:”#8b949e”, marginLeft:8 }}>Auto-Scroll</span>
+</div>
+<div style={{ fontSize:10, color:”#8b949e”, display:“flex”, alignItems:“center”, gap:4 }}>
+{paused ? “⏸ Pausiert” : “▶ Läuft”}
+</div>
+</div>
+<div style={{ width:“100%”, height:3, background:“rgba(255,255,255,0.1)”, borderRadius:2, marginBottom:12 }}>
+<div style={{ width:`${progress}%`, height:“100%”, background:“linear-gradient(90deg,#8be9fd,#bd93f9)”, borderRadius:2, transition:“width 0.03s linear” }} />
+</div>
+<div style={{ flex:1, display:“flex”, flexDirection:“column”, gap:10, overflow:“hidden” }} ref={scrollRef}>
+{visible.map((n, i) => (
+<div key={currentIdx + i} style={{
+background: i === 0 ? “rgba(139,233,253,0.08)” : “rgba(255,255,255,0.03)”,
+border: i === 0 ? “1px solid rgba(139,233,253,0.2)” : “1px solid rgba(255,255,255,0.06)”,
+borderRadius:12, padding:“12px 14px”,
+opacity: i === 0 ? 1 : 1 - i * 0.2,
+transform: `scale(${1 - i * 0.02})`,
+transition:“all 0.5s ease”
+}}>
+<div style={{ display:“flex”, alignItems:“center”, gap:8, marginBottom:6 }}>
+<span style={{ fontSize:22 }}>{n.emoji}</span>
+<span style={{
+fontSize:9, fontWeight:700, textTransform:“uppercase”, letterSpacing:1,
+color: catColors[n.cat] || “#8be9fd”,
+background: `${catColors[n.cat] || "#8be9fd"}15`,
+padding:“2px 8px”, borderRadius:10
+}}>{n.cat}</span>
+</div>
+<div style={{ fontSize:14, fontWeight:700, color:”#fff”, lineHeight:1.3, marginBottom:4 }}>{n.title}</div>
+{i < 2 && <div style={{ fontSize:12, color:”#8b949e”, lineHeight:1.5 }}>{n.text}</div>}
+</div>
+))}
+</div>
+<div style={{ display:“flex”, justifyContent:“center”, gap:4, marginTop:10 }}>
+{goodNews.map((_, i) => (
+<div key={i} style={{
+width: i === currentIdx ? 16 : 4, height:4, borderRadius:2,
+background: i === currentIdx ? “#8be9fd” : “rgba(255,255,255,0.15)”,
+transition:“all 0.3s”
+}} />
+))}
+</div>
+</div>
+);
+}
+
+export default function App() {
+return (
+<div style={{ display:“flex”, height:“100vh”, fontFamily:”-apple-system,BlinkMacSystemFont,sans-serif”, overflow:“hidden” }}>
+<div style={{ width:“280px”, minWidth:“280px”, borderRight:“1px solid rgba(255,255,255,0.1)” }}>
+<CookieClicker />
+</div>
+<div style={{ flex:1, minWidth:0 }}>
+<NewsFeed />
+</div>
+</div>
+);
+}

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good News + Cookie Clicker</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; height:100vh; overflow:hidden; background:#0d1117; }
+
+  /* ===== COOKIE CLICKER (links) ===== */
+  #cookie-side {
+    width:20%; min-width:250px; display:flex; flex-direction:column;
+    background:linear-gradient(180deg,#150b22,#1f2a49); color:#fff;
+    padding:12px; overflow-y:auto; border-right:1px solid rgba(255,255,255,0.1);
+  }
+  #cookie-side::-webkit-scrollbar { width:4px; }
+  #cookie-side::-webkit-scrollbar-thumb { background:#624a85; border-radius:4px; }
+
+  .cookie-header { text-align:center; margin-bottom:8px; }
+  .cookie-label { font-size:12px; color:#75c2d1; letter-spacing:1px; text-transform:uppercase; }
+  .cookie-count { font-size:28px; font-weight:800; color:#f1fa8c; }
+  .cookie-cps { font-size:11px; color:#888888; }
+
+  .cookie-btn-wrap { text-align:center; margin:8px 0; position:relative; }
+  #cookie-btn {
+    font-size:56px; background:none; border:none; cursor:pointer;
+    transition:transform 0.1s; filter:drop-shadow(0 0 12px rgba(241,250,140,0.5));
+    user-select:none;
+  }
+  #cookie-btn:active { transform:scale(0.88); }
+  #cookie-btn.clicked { transform:scale(0.88); }
+
+  .float-text {
+    position:absolute; left:50%; top:30%; pointer-events:none;
+    font-size:14px; font-weight:700; color:#f1fa8c;
+    animation:floatUp 0.8s ease-out forwards;
+  }
+  @keyframes floatUp {
+    0%{opacity:1;transform:translateX(-50%) translateY(0)}
+    100%{opacity:0;transform:translateX(-50%) translateY(-40px)}
+  }
+
+  .upgrades { flex:1; }
+  .upgrade-btn {
+    display:flex; align-items:center; gap:8px; width:100%;
+    padding:6px 8px; margin-bottom:4px; border-radius:8px;
+    border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05);
+    color:#666; cursor:not-allowed; text-align:left; transition:all 0.2s;
+    font-family:inherit;
+  }
+  .upgrade-btn.can-buy {
+    background:rgba(139,233,253,0.1); border-color:rgba(139,233,253,0.3);
+    color:#fff; cursor:pointer;
+  }
+  .upgrade-icon { font-size:26px; }
+  .upgrade-info { flex:1; }
+  .upgrade-name { font-size:16px; font-weight:600; }
+  .upgrade-name span { color:#bd93f9; }
+  .upgrade-cost { font-size:12px; color:#8be9fd; }
+
+  /* ===== NEWS FEED (rechts) ===== */ 
+  #news-side {
+    flex:1; display:flex; flex-direction:column;
+    background:linear-gradient(180deg,#0d1117,#161b22);
+    padding:12px 16px; overflow:hidden; min-width:0;
+  }
+
+  .news-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .news-title { font-size:16px; font-weight:800; color:#fff; }
+  .news-subtitle { font-size:10px; color:#8b949e; margin-left:8px; }
+  .news-status { font-size:10px; color:#8b949e; }
+
+  .progress-bar { width:100%; height:3px; background:rgba(255,255,255,0.1); border-radius:2px; margin-bottom:12px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,#8be9fd,#bd93f9); border-radius:2px; transition:width 0.03s linear; }
+
+  #news-cards { flex:1; display:flex; flex-direction:column; gap:10px; overflow:hidden; }
+
+  .news-card {
+    border-radius:12px; padding:12px 14px; transition:all 0.5s ease;
+  }
+  .news-card.active { background:rgba(139,233,253,0.08); border:1px solid rgba(139,233,253,0.2); }
+  .news-card.faded { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+
+  .card-top { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .card-cat {
+    font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+    padding:2px 8px; border-radius:10px;
+  }
+  .card-title { font-size:14px; font-weight:700; color:#fff; line-height:1.3; margin-bottom:4px; }
+  .card-text { font-size:12px; color:#8b949e; line-height:1.5; }
+
+  .dots { display:flex; justify-content:center; gap:4px; margin-top:10px; }
+  .dot {
+    height:4px; border-radius:2px; transition:all 0.3s;
+    background:rgba(255,255,255,0.15); width:4px;
+  }
+  .dot.active { width:16px; background:#8be9fd; }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:600px){
+    body { flex-direction:column; }
+    #cookie-side { width:100%; min-width:unset; height:45vh; border-right:none; border-bottom:1px solid rgba(255,255,255,0.1); }
+    #news-side { height:55vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COOKIE CLICKER -->
+<div id="cookie-side">
+  <div class="cookie-header">
+    <div class="cookie-label">Cookie Clicker</div>
+    <div class="cookie-count" id="cookie-count">0</div>
+    <div class="cookie-cps"><span id="cps-display">0</span> pro Sekunde</div>
+  </div>
+  <div class="cookie-btn-wrap">
+    <button id="cookie-btn"><img src="7881cc70-477b-4f5f-b5b9-f179973f914d.png" width="100" height="100" ></button>
+    <div id="float-container"></div>
+  </div>
+  <div class="upgrades" id="upgrades"></div>
+</div>
+
+<!-- NEWS FEED -->
+<div id="news-side">
+  <div class="news-header">
+    <div><span class="news-title">Good News</span><span class="news-subtitle">Auto-Scroll</span></div>
+    <div class="news-status" id="news-status">▶ Läuft</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div id="news-cards"></div>
+  <div class="dots" id="dots"></div>
+</div>
+ 
+<script>
+// ===== COOKIE CLICKER LOGIC =====
+const upgrades = [
+  { name:"Besserer Cursor", cost:15, cps:0.1, icon:"👆" },
+  { name:"Oma-Bäckerin", cost:100, cps:1, icon:"👵" },
+  { name:"Cookie-Farm", cost:500, cps:5, icon:"🌾" },
+  { name:"Cookie-Fabrik", cost:2000, cps:20, icon:"🏭" },
+  { name:"Cookie-Mine", cost:7000, cps:75, icon:"⛏️" },
+  { name:"Cookie-Bank", cost:25000, cps:250, icon:"🏦" },
+  { name:"Cookie-Tempel", cost:100000, cps:1000, icon:"🏛️" },
+  { name:"Cookie-Gott", cost:1000000, cps:5000, icon:"🍪" },
+];
+
+let cookies = 0, cps = 0;
+const owned = upgrades.map(() => 0);
+
+function fmt(n) {
+  if(n>=1e12) return (n/1e12).toFixed(1)+"T";
+  if(n>=1e9) return (n/1e9).toFixed(1)+"B";
+  if(n>=1e6) return (n/1e6).toFixed(1)+"M";
+  if(n>=1e3) return (n/1e3).toFixed(1)+"K";
+  return Math.floor(n).toString();
+}
+
+function updateDisplay() {
+  document.getElementById("cookie-count").textContent = fmt(cookies);
+  document.getElementById("cps-display").textContent = fmt(cps);
+  renderUpgrades();
+}
+
+function renderUpgrades() {
+  const el = document.getElementById("upgrades");
+  el.innerHTML = "";
+  upgrades.forEach((u, i) => {
+    const cost = Math.floor(u.cost * Math.pow(1.15, owned[i]));
+    const can = cookies >= cost;
+    const btn = document.createElement("button");
+    btn.className = "upgrade-btn" + (can ? " can-buy" : "");
+    btn.innerHTML = `
+      <span class="upgrade-icon">${u.icon}</span>
+      <div class="upgrade-info">
+        <div class="upgrade-name">${u.name} <span>x${owned[i]}</span></div>
+        <div class="upgrade-cost">${fmt(cost)} <img src="7881cc70-477b-4f5f-b5b9-f179973f914d.png" alt="Keks" width="10 " height="10"> | +${u.cps}/s</div>
+      </div>`;
+    btn.onclick = () => {
+      if(cookies >= cost) {
+        cookies -= cost;
+        cps += u.cps;
+        owned[i]++;
+        updateDisplay();
+      }
+    };
+    el.appendChild(btn);
+  });
+}
+
+document.getElementById("cookie-btn").addEventListener("click", () => {
+  cookies++;
+  updateDisplay();
+  const btn = document.getElementById("cookie-btn");
+  btn.classList.add("clicked");
+  setTimeout(() => btn.classList.remove("clicked"), 100);
+  const f = document.createElement("span");
+  f.className = "float-text";
+  f.textContent = "+1";
+  document.getElementById("float-container").appendChild(f);
+  setTimeout(() => f.remove(), 800);
+});
+
+setInterval(() => { cookies += cps / 10; updateDisplay(); }, 100);
+updateDisplay();
+
+// ===== NEWS FEED LOGIC =====
+const goodNews = [
+  {cat:"Umwelt",title:"Großstädte senken Luftverschmutzung drastisch",text:"19 Metropolen weltweit haben ihre Luftverschmutzung in nur 15 Jahren um 20-40% reduziert. Radfahren, Umweltzonen und E-Autos treiben den Wandel."},
+  {cat:"Natur",title:"Riesenschildkröten kehren nach Galapagos zurück",text:"Zum ersten Mal seit fast 200 Jahren streifen Riesenschildkröten wieder über die Galapagos-Insel Floreana."},
+  {cat:"Gesundheit",title:"Neue Behandlung für Spina bifida zeigt Erfolge",text:"Eine bahnbrechende Stammzellbehandlung verbessert die Mobilität von Kindern mit Spina bifida bereits im Mutterleib."},
+  {cat:"Medizin",title:"Unheilbare Augenkrankheit erstmals behandelt",text:"Das Moorfields Eye Hospital hat erstmals erfolgreich Hypotonie behandelt – bei 7 von 8 Patienten verbesserte sich der Zustand."},
+  {cat:"Ozean",title:"Globaler Ozeanvertrag tritt in Kraft",text:"Der Global Ocean Treaty ist offiziell in Kraft getreten und schützt nun die Hochsee weltweit."},
+  {cat:"Sicherheit",title:"US-Mordrate sinkt auf historisches Tief",text:"Die Mordrate in den USA fällt seit 2023 kontinuierlich und erreichte 2025 einen historischen Rückgang."},
+  {cat:"Natur",title:"Rewilding: 900% mehr Brutvögel in 20 Jahren",text:"Das Knepp Rewilding Estate verzeichnet eine dramatische Erholung: Libellen nahmen um 900% zu."},
+  {cat:"Umwelt",title:"Chile plant riesigen Nationalpark",text:"Der Cape Froward Nationalpark wird 150.000 Hektar subantarktische Wälder an der Südspitze Amerikas schützen."},
+  {cat:"Medizin",title:"Neues Medikament hilft bei seltener Epilepsie",text:"Zorevunersen reduziert Anfälle bei Kindern mit Dravet-Syndrom um bis zu 91%."},
+  {cat:"Energie",title:"Erstes Geothermie-Kraftwerk in UK läuft",text:"Das United Downs Kraftwerk in Cornwall liefert sauberen Strom für 10.000 Haushalte."},
+  {cat:"Energie",title:"Afrikas Solarenergie boomt",text:"Afrika macht große Fortschritte bei Solarenergie und überspringt fossile Brennstoffe."},
+  {cat:"Natur",title:"Ukraine: Feuchtgebiet erholt sich trotz Krieg",text:"Am Kartal-See zeigt ein Renaturierungsprojekt erstaunliche Ergebnisse."},
+  {cat:"Kultur",title:"20 Jahre Quick Reads: Lesen für alle",text:"Kurze, günstige Bücher von Bestsellerautoren – erstmals auch als Hörbücher. 500.000 Exemplare für Gefängnisse."},
+  {cat:"Klima",title:"Net Zero günstiger als Öl-Preisschock",text:"Der Weg zu Klimaneutralität kostet weniger als die Folgen der Abhängigkeit von fossilen Brennstoffen."},
+  {cat:"Energie",title:"Offshore-Windpark trotzt Widerstand",text:"Vineyard Wind vor Massachusetts liefert saubere Energie – der erste fertiggestellte Offshore-Windpark."},
+  {cat:"Frieden",title:"Kroatien ist landminenfrei",text:"Kroatien hat offiziell alle Landminen entfernt – ein historischer Erfolg."},
+  {cat:"Natur",title:"Ausgestorbene Art kehrt nach England zurück",text:"Naturschutzmaßnahmen wirken: Eine als ausgestorben geltende Art ist zurück."},
+  {cat:"Wirtschaft",title:"Grüne Tech treibt Chinas Wachstum",text:"E-Autos und Solarenergie waren für über ein Drittel des chinesischen Wirtschaftswachstums verantwortlich."},
+  {cat:"Natur",title:"Chinesischer Fluss erholt sich",text:"Ein Fluss am Rande des Zusammenbruchs zeigt bemerkenswerte Erholung dank Schutzmaßnahmen."},
+  {cat:"Umwelt",title:"Diesel verschwindet aus Großbritannien",text:"Bis 2035 werden weniger als 250.000 Diesel-PKW auf britischen Straßen unterwegs sein."},
+];
+
+const catColors = {
+  Umwelt:"#50fa7b",Natur:"#8be9fd",Gesundheit:"#ff79c6",Medizin:"#ff79c6",
+  Ozean:"#8be9fd",Sicherheit:"#ffb86c",Energie:"#f1fa8c",Kultur:"#bd93f9",
+  Klima:"#50fa7b",Frieden:"#ffb86c",Wirtschaft:"#f1fa8c"
+};
+
+let currentIdx = 0, progress = 0, paused = false;
+
+// Build dots
+const dotsEl = document.getElementById("dots");
+goodNews.forEach((_, i) => {
+  const d = document.createElement("div");
+  d.className = "dot" + (i === 0 ? " active" : "");
+  d.id = "dot-" + i;
+  dotsEl.appendChild(d);
+});
+
+function renderCards() {
+  const container = document.getElementById("news-cards");
+  container.innerHTML = "";
+  for(let i = 0; i < 4; i++) {
+    const n = goodNews[(currentIdx + i) % goodNews.length];
+    const col = catColors[n.cat] || "#8be9fd";
+    const card = document.createElement("div");
+    card.className = "news-card " + (i === 0 ? "active" : "faded");
+    card.style.opacity = 1 - i * 0.2;
+    card.style.transform = `scale(${1 - i * 0.02})`;
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="card-cat" style="color:${col};background:${col}15">${n.cat}</span>
+      </div>
+      <div class="card-title">${n.title}</div>
+      ${i < 2 ? `<div class="card-text">${n.text}</div>` : ""}`;
+    container.appendChild(card);
+  }
+  goodNews.forEach((_, i) => {
+    const d = document.getElementById("dot-" + i);
+    d.className = i === currentIdx ? "dot active" : "dot";
+  });
+}
+
+const newsSide = document.getElementById("news-side");
+newsSide.addEventListener("mouseenter", () => { paused = true; document.getElementById("news-status").textContent = "⏸ Pausiert"; });
+newsSide.addEventListener("mouseleave", () => { paused = false; document.getElementById("news-status").textContent = "▶ Läuft"; });
+newsSide.addEventListener("touchstart", () => { paused = true; document.getElementById("news-status").textContent = "⏸ Pausiert"; });
+newsSide.addEventListener("touchend", () => { paused = false; document.getElementById("news-status").textContent = "▶ Läuft"; });
+
+setInterval(() => {
+  if(paused) return;
+  progress += 0.5;
+  if(progress >= 100) {
+    progress = 0;
+    currentIdx = (currentIdx + 1) % goodNews.length;
+    renderCards();
+  }
+  document.getElementById("progress-fill").style.width = progress + "%";
+}, 30);
+
+renderCards();
+</script>
+</body>
+</html>
