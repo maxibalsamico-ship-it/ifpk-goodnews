@@ -46,7 +46,6 @@
     background:rgba(139,233,253,0.15); border-color:rgba(139,233,253,0.3);
     color:#fff; cursor:pointer;
   }
-  .upgrade-btn.can-buy:hover { background:rgba(139,233,253,0.25); }
   .upgrade-icon { font-size:20px; }
   .upgrade-info { flex:1; }
   .upgrade-name { font-size:12px; font-weight:600; }
