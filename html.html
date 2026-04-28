@@ -19,6 +19,7 @@
     <button id="cookie-btn">🍪</button>
     <div id="float-container"></div>
   </div>
+  <p></p>
   <div class="upgrades" id="upgrades"></div>
 </div>
 
@@ -36,7 +37,7 @@
 <script>
 // ===== COOKIE CLICKER LOGIC =====
 const upgrades = [
-  { name:"Besserer Cursor", cost:15, cps:0.1, icon:"👆" },
+  { name:"Besserer Cursor", cost:15, cps:0.5, icon:"👆" },
   { name:"Oma-Bäckerin", cost:100, cps:1, icon:"👵" },
   { name:"Cookie-Farm", cost:500, cps:5, icon:"🌾" },
   { name:"Cookie-Fabrik", cost:2000, cps:20, icon:"🏭" },
@@ -106,8 +107,8 @@ updateDisplay();
 
 // ===== NEWS FEED LOGIC =====
 const goodNews = [
-  {emoji:"🌍",cat:"Umwelt",title:"Großstädte senken Luftverschmutzung drastisch",text:"19 Metropolen weltweit haben ihre Luftverschmutzung in nur 15 Jahren um 20-40% reduziert. Radfahren, Umweltzonen und E-Autos treiben den Wandel."},
-  {emoji:"🐢",cat:"Natur",title:"Riesenschildkröten kehren nach Galapagos zurück",text:"Zum ersten Mal seit fast 200 Jahren streifen Riesenschildkröten wieder über die Galapagos-Insel Floreana."},
+  {cat:"Umwelt",title:"Großstädte senken Luftverschmutzung drastisch",text:"19 Metropolen weltweit haben ihre Luftverschmutzung in nur 15 Jahren um 20-40% reduziert. Radfahren, Umweltzonen und E-Autos treiben den Wandel."},
+  {cat:"Natur",title:"Riesenschildkröten kehren nach Galapagos zurück",text:"Zum ersten Mal seit fast 200 Jahren streifen Riesenschildkröten wieder über die Galapagos-Insel Floreana."},
   {emoji:"💊",cat:"Gesundheit",title:"Neue Behandlung für Spina bifida zeigt Erfolge",text:"Eine bahnbrechende Stammzellbehandlung verbessert die Mobilität von Kindern mit Spina bifida bereits im Mutterleib."},
   {emoji:"🏥",cat:"Medizin",title:"Unheilbare Augenkrankheit erstmals behandelt",text:"Das Moorfields Eye Hospital hat erstmals erfolgreich Hypotonie behandelt – bei 7 von 8 Patienten verbesserte sich der Zustand."},
   {emoji:"🌊",cat:"Ozean",title:"Globaler Ozeanvertrag tritt in Kraft",text:"Der Global Ocean Treaty ist offiziell in Kraft getreten und schützt nun die Hochsee weltweit."},
