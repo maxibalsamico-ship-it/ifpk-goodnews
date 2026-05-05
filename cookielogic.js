@@ -1,0 +1,205 @@
+// ===== DATA =====
+
+const UPGRADES = [
+  { name: "Besserer Cursor", cost: 15,     cps: 0.5,  icon: "👆" },
+  { name: "Oma-Bäckerin",   cost: 100,    cps: 1,    icon: "👵" },
+  { name: "Cookie-Farm",    cost: 500,    cps: 5,    icon: "🌾" },
+  { name: "Cookie-Fabrik",  cost: 2000,   cps: 20,   icon: "🏭" },
+  { name: "Cookie-Mine",    cost: 7000,   cps: 75,   icon: "⛏️" },
+  { name: "Cookie-Bank",    cost: 25000,  cps: 250,  icon: "🏦" },
+  { name: "Cookie-Tempel",  cost: 100000, cps: 1000, icon: "🏛️" },
+];
+
+const GOOD_NEWS = [
+  { emoji: "🌱", cat: "Umwelt",     title: "Großstädte senken Luftverschmutzung drastisch",   text: "19 Metropolen weltweit haben ihre Luftverschmutzung in nur 15 Jahren um 20-40% reduziert. Radfahren, Umweltzonen und E-Autos treiben den Wandel." },
+  { emoji: "🐢", cat: "Natur",      title: "Riesenschildkröten kehren nach Galapagos zurück",  text: "Zum ersten Mal seit fast 200 Jahren streifen Riesenschildkröten wieder über die Galapagos-Insel Floreana." },
+  { emoji: "💊", cat: "Gesundheit", title: "Neue Behandlung für Spina bifida zeigt Erfolge",   text: "Eine bahnbrechende Stammzellbehandlung verbessert die Mobilität von Kindern mit Spina bifida bereits im Mutterleib." },
+  { emoji: "🏥", cat: "Medizin",    title: "Unheilbare Augenkrankheit erstmals behandelt",      text: "Das Moorfields Eye Hospital hat erstmals erfolgreich Hypotonie behandelt – bei 7 von 8 Patienten verbesserte sich der Zustand." },
+  { emoji: "🌊", cat: "Ozean",      title: "Globaler Ozeanvertrag tritt in Kraft",              text: "Der Global Ocean Treaty ist offiziell in Kraft getreten und schützt nun die Hochsee weltweit." },
+  { emoji: "📉", cat: "Sicherheit", title: "US-Mordrate sinkt auf historisches Tief",           text: "Die Mordrate in den USA fällt seit 2023 kontinuierlich und erreichte 2025 einen historischen Rückgang." },
+  { emoji: "🦋", cat: "Natur",      title: "Rewilding: 900% mehr Brutvögel in 20 Jahren",      text: "Das Knepp Rewilding Estate verzeichnet eine dramatische Erholung: Libellen nahmen um 900% zu." },
+  { emoji: "🌿", cat: "Umwelt",     title: "Chile plant riesigen Nationalpark",                 text: "Der Cape Froward Nationalpark wird 150.000 Hektar subantarktische Wälder an der Südspitze Amerikas schützen." },
+  { emoji: "🔬", cat: "Medizin",    title: "Neues Medikament hilft bei seltener Epilepsie",    text: "Zorevunersen reduziert Anfälle bei Kindern mit Dravet-Syndrom um bis zu 91%." },
+  { emoji: "💨", cat: "Energie",    title: "Erstes Geothermie-Kraftwerk in UK läuft",          text: "Das United Downs Kraftwerk in Cornwall liefert sauberen Strom für 10.000 Haushalte." },
+  { emoji: "🌞", cat: "Energie",    title: "Afrikas Solarenergie boomt",                        text: "Afrika macht große Fortschritte bei Solarenergie und überspringt fossile Brennstoffe." },
+  { emoji: "🇺🇦", cat: "Natur",    title: "Ukraine: Feuchtgebiet erholt sich trotz Krieg",    text: "Am Kartal-See zeigt ein Renaturierungsprojekt erstaunliche Ergebnisse." },
+  { emoji: "📖", cat: "Kultur",     title: "20 Jahre Quick Reads: Lesen für alle",              text: "Kurze, günstige Bücher von Bestsellerautoren – erstmals auch als Hörbücher. 500.000 Exemplare für Gefängnisse." },
+  { emoji: "🏭", cat: "Klima",      title: "Net Zero günstiger als Öl-Preisschock",             text: "Der Weg zu Klimaneutralität kostet weniger als die Folgen der Abhängigkeit von fossilen Brennstoffen." },
+  { emoji: "⚡", cat: "Energie",    title: "Offshore-Windpark trotzt Widerstand",               text: "Vineyard Wind vor Massachusetts liefert saubere Energie – der erste fertiggestellte Offshore-Windpark." },
+  { emoji: "🇭🇷", cat: "Frieden",  title: "Kroatien ist landminenfrei",                        text: "Kroatien hat offiziell alle Landminen entfernt – ein historischer Erfolg." },
+  { emoji: "🦎", cat: "Natur",      title: "Ausgestorbene Art kehrt nach England zurück",       text: "Naturschutzmaßnahmen wirken: Eine als ausgestorben geltende Art ist zurück." },
+  { emoji: "🚗", cat: "Umwelt",     title: "Diesel verschwindet aus Großbritannien",            text: "Bis 2035 werden weniger als 250.000 Diesel-PKW auf britischen Straßen unterwegs sein." },
+  { emoji: "🇨🇳", cat: "Wirtschaft", title: "Grüne Tech treibt Chinas Wachstum",              text: "E-Autos und Solarenergie waren für über ein Drittel des chinesischen Wirtschaftswachstums verantwortlich." },
+  { emoji: "🏞️", cat: "Natur",     title: "Chinesischer Fluss erholt sich",                    text: "Ein Fluss am Rande des Zusammenbruchs zeigt bemerkenswerte Erholung dank Schutzmaßnahmen." },
+];
+
+const CAT_COLORS = {
+  Umwelt:     "#50fa7b",
+  Natur:      "#8be9fd",
+  Gesundheit: "#ff79c6",
+  Medizin:    "#ff79c6",
+  Ozean:      "#8be9fd",
+  Sicherheit: "#ffb86c",
+  Energie:    "#f1fa8c",
+  Kultur:     "#bd93f9",
+  Klima:      "#50fa7b",
+  Frieden:    "#ffb86c",
+  Wirtschaft: "#f1fa8c",
+};
+
+// ===== COOKIE CLICKER =====
+
+let cookies = 0;
+let cps = 0;
+const owned = UPGRADES.map(() => 0);
+
+function fmt(n) {
+  if (n >= 1e12) return (n / 1e12).toFixed(1) + "T";
+  if (n >= 1e9)  return (n / 1e9).toFixed(1)  + "B";
+  if (n >= 1e6)  return (n / 1e6).toFixed(1)  + "M";
+  if (n >= 1e3)  return (n / 1e3).toFixed(1)  + "K";
+  return Math.floor(n).toString();
+}
+
+function upgradeCost(i) {
+  return Math.floor(UPGRADES[i].cost * Math.pow(1.15, owned[i]));
+}
+
+function refreshCounts() {
+  document.getElementById("cookie-count").textContent = fmt(cookies);
+  document.getElementById("cps-display").textContent  = fmt(cps);
+}
+
+function refreshUpgradeBtn(i) {
+  const cost = upgradeCost(i);
+  const btn  = document.getElementById("upgrade-btn-" + i);
+  btn.classList.toggle("can-buy", cookies >= cost);
+  document.getElementById("upgrade-cost-"  + i).textContent = `${fmt(cost)} 🍪 | +${UPGRADES[i].cps}/s`;
+  document.getElementById("upgrade-owned-" + i).textContent = `x${owned[i]}`;
+}
+
+function refreshAllUpgradeBtns() {
+  UPGRADES.forEach((_, i) => refreshUpgradeBtn(i));
+}
+
+function buyUpgrade(i) {
+  const cost = upgradeCost(i);
+  if (cookies < cost) return;
+  cookies -= cost;
+  cps     += UPGRADES[i].cps;
+  owned[i]++;
+  refreshCounts();
+  refreshAllUpgradeBtns();
+}
+
+function initUpgrades() {
+  const el = document.getElementById("upgrades");
+  UPGRADES.forEach((u, i) => {
+    const btn = document.createElement("button");
+    btn.className = "upgrade-btn";
+    btn.id        = "upgrade-btn-" + i;
+    btn.innerHTML = `
+      <span class="upgrade-icon">${u.icon}</span>
+      <div class="upgrade-info">
+        <div class="upgrade-name">${u.name} <span id="upgrade-owned-${i}">x0</span></div>
+        <div class="upgrade-cost" id="upgrade-cost-${i}">${fmt(upgradeCost(i))} 🍪 | +${u.cps}/s</div>
+      </div>`;
+    btn.onclick = () => buyUpgrade(i);
+    el.appendChild(btn);
+  });
+}
+
+function spawnFloat() {
+  const f = document.createElement("span");
+  f.className   = "float-text";
+  f.textContent = "+1";
+  document.getElementById("float-container").appendChild(f);
+  setTimeout(() => f.remove(), 800);
+}
+
+document.getElementById("cookie-btn").addEventListener("click", () => {
+  cookies++;
+  refreshCounts();
+  refreshAllUpgradeBtns();
+  const btn = document.getElementById("cookie-btn");
+  btn.classList.add("clicked");
+  setTimeout(() => btn.classList.remove("clicked"), 100);
+  spawnFloat();
+});
+
+// Periodic tick: nur Zähler + can-buy-Status aktualisieren, kein DOM-Rebuild
+setInterval(() => {
+  cookies += cps / 10;
+  refreshCounts();
+  UPGRADES.forEach((_, i) => {
+    const btn    = document.getElementById("upgrade-btn-" + i);
+    const canBuy = cookies >= upgradeCost(i);
+    if (btn.classList.contains("can-buy") !== canBuy) {
+      btn.classList.toggle("can-buy", canBuy);
+    }
+  });
+}, 100);
+
+initUpgrades();
+refreshCounts();
+
+// ===== NEWS FEED =====
+
+let currentIdx = 0;
+let progress   = 0;
+let paused     = false;
+
+const dotsEl = document.getElementById("dots");
+GOOD_NEWS.forEach((_, i) => {
+  const d = document.createElement("div");
+  d.className = "dot" + (i === 0 ? " active" : "");
+  d.id        = "dot-" + i;
+  dotsEl.appendChild(d);
+});
+
+function renderCards() {
+  const container = document.getElementById("news-cards");
+  container.innerHTML = "";
+  for (let i = 0; i < 4; i++) {
+    const n   = GOOD_NEWS[(currentIdx + i) % GOOD_NEWS.length];
+    const col = CAT_COLORS[n.cat] || "#8be9fd";
+    const card = document.createElement("div");
+    card.className       = "news-card " + (i === 0 ? "active" : "faded");
+    card.style.opacity   = 1 - i * 0.2;
+    card.style.transform = `scale(${1 - i * 0.02})`;
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="card-emoji">${n.emoji}</span>
+        <span class="card-cat" style="color:${col};background:${col}15">${n.cat}</span>
+      </div>
+      <div class="card-title">${n.title}</div>
+      ${i < 2 ? `<div class="card-text">${n.text}</div>` : ""}`;
+    container.appendChild(card);
+  }
+  GOOD_NEWS.forEach((_, i) => {
+    document.getElementById("dot-" + i).className = i === currentIdx ? "dot active" : "dot";
+  });
+}
+
+function setNewsStatus(text) {
+  document.getElementById("news-status").textContent = text;
+}
+
+const newsSide = document.getElementById("news-side");
+newsSide.addEventListener("mouseenter", () => { paused = true;  setNewsStatus("⏸ Pausiert"); });
+newsSide.addEventListener("mouseleave", () => { paused = false; setNewsStatus("▶ Läuft"); });
+newsSide.addEventListener("touchstart", () => { paused = true;  setNewsStatus("⏸ Pausiert"); });
+newsSide.addEventListener("touchend",   () => { paused = false; setNewsStatus("▶ Läuft"); });
+
+setInterval(() => {
+  if (paused) return;
+  progress += 0.5;
+  if (progress >= 100) {
+    progress   = 0;
+    currentIdx = (currentIdx + 1) % GOOD_NEWS.length;
+    renderCards();
+  }
+  document.getElementById("progress-fill").style.width = progress + "%";
+}, 30);
+
+renderCards();
